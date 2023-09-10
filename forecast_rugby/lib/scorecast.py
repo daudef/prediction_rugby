@@ -70,7 +70,7 @@ class DiffInterval(pydantic.BaseModel):
 class UserForecast(pydantic.BaseModel):
     score1: int
     score2: int
-    winnerId: str
+    winnerId: str | None
     gameId: str
 
 
