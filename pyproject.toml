@@ -1,0 +1,18 @@
+[tool.poetry]
+name = "forecast-rugby"
+version = "0.1.0"
+description = ""
+authors = ["Florian Daude <floriandaude@hotmail.fr>"]
+readme = "README.md"
+packages = [{include = "forecast_rugby"}]
+
+[tool.poetry.dependencies]
+python = "^3.11"
+bs4 = "^0.0.1"
+pydantic = "^2.3.0"
+httpx = "^0.24.1"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"

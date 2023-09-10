@@ -1,0 +1,7 @@
+.vscode/
+.venv/
+logs/
+config.toml
+__pycache__
+.DS_Store
+scorecast.jwt
