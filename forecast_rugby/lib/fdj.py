@@ -14,9 +14,11 @@ FULL_MATCH_SUFFIX = " - 80 mins".lower().strip()
 
 async def get_document(url: pydantic.HttpUrl, http_client: httpx.AsyncClient):
     response = await http_client.get(str(url))
-    assert response.status_code == 200
-    response.text
-    return bs4.BeautifulSoup(response.text, "html.parser")
+    try:
+        return bs4.BeautifulSoup(response.text, "html.parser")
+    except Exception:
+        raise Exception(response.status_code, response.text)
+
 
 
 def get_country_names(url: pydantic.HttpUrl):
