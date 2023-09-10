@@ -241,6 +241,9 @@ async def apply_forecast_updates(
 async def send_predictions(
     predictions: list[model.Prediction], config: cfg.Config, http_client: httpx.AsyncClient
 ):
+    if len(predictions) == 0:
+        print("Nothing to do")
+        return
     token = await get_token(config.scorecast, http_client)
     games = await get_games(token, config=config.scorecast, http_client=http_client)
     mapped_predictions = map_predictions(predictions=predictions, games=games)
