@@ -176,6 +176,8 @@ def make_forecasts(mapped_predictions: list[MappedPrediction]):
 
 
 def get_winner_name(forecast: UserForecast, game: Game):
+    if forecast.winnerId is None:
+        return "none"
     return (
         game.competitor1.name if game.competitor1.id == forecast.winnerId else game.competitor2.name
     )
