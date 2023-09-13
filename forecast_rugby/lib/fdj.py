@@ -107,12 +107,14 @@ def group_forecast_by_country(forecasts: list[Forecast], *, c1: str, c2: str):
     forecasts_by_country: dict[str, list[Forecast]] = collections.defaultdict(list)
     for forecast in forecasts:
         forecasts_by_country[forecast.cscore.country].append(forecast)
-    if set(forecasts_by_country.keys()) != {c1, c2}:
+    if not set(forecasts_by_country.keys()).issubset({c1, c2}):
         raise Exception(
             f"forecast countries are {list(forecasts_by_country.keys())}"
             + f" but searched countries are {c1} and {c2}"
         )
-    return GroupedForecasts(c1=forecasts_by_country[c1], c2=forecasts_by_country[c2])
+    return GroupedForecasts(
+        c1=forecasts_by_country.get(c1, []), c2=forecasts_by_country.get(c2, [])
+    )
 
 
 def get_average_points_from_forecasts(forecasts: list[Forecast]):
@@ -125,12 +127,11 @@ def get_average_points_from_forecasts(forecasts: list[Forecast]):
             a = f.cscore.score
         if f.ratings.more >= f.ratings.less:
             b = f.cscore.score
-
     if a is None:
-        assert b is not None
+        if b is None:
+            return None
         return b
     if b is None:
-        assert a is not None
         return a
     return (a + b) / 2
 
@@ -145,6 +146,12 @@ async def make_prediction(match: model.Match, http_client: httpx.AsyncClient):
     )
     p1 = get_average_points_from_forecasts(grouped_forecasts.c1)
     p2 = get_average_points_from_forecasts(grouped_forecasts.c2)
+    if p1 is None or p2 is None:
+        print(
+            f"score prediction is {p1} for {match.country1.fdj}, and {p2} for {match.country2.fdj}"
+            + " which is not enough to make a full predction"
+        )
+        return None
     return model.Prediction(
         match=match,
         country1_is_winning=p1 >= p2,
