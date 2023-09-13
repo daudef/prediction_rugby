@@ -20,7 +20,6 @@ async def get_document(url: pydantic.HttpUrl, http_client: httpx.AsyncClient):
         raise Exception(response.status_code, response.text)
 
 
-
 def get_country_names(url: pydantic.HttpUrl):
     assert url.path is not None
     (c1, c2) = url.path.split("/")[-1].split("-vs-")
@@ -108,7 +107,11 @@ def group_forecast_by_country(forecasts: list[Forecast], *, c1: str, c2: str):
     forecasts_by_country: dict[str, list[Forecast]] = collections.defaultdict(list)
     for forecast in forecasts:
         forecasts_by_country[forecast.cscore.country].append(forecast)
-    assert set(forecasts_by_country.keys()) == {c1, c2}
+    if set(forecasts_by_country.keys()) != {c1, c2}:
+        raise Exception(
+            f"forecast countries are {list(forecasts_by_country.keys())}"
+            + f" but searched countries are {c1} and {c2}"
+        )
     return GroupedForecasts(c1=forecasts_by_country[c1], c2=forecasts_by_country[c2])
 
 
