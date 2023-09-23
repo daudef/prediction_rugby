@@ -53,7 +53,9 @@ def get_country_score(tag: bs4.Tag):
         if not child.startswith(POINTS_PREFIX) or not child.endswith(FULL_MATCH_SUFFIX):
             return
         *country, score = child.removeprefix(POINTS_PREFIX).removesuffix(FULL_MATCH_SUFFIX).split()
-        return CountryScore(country="-".join(country), score=float(score.replace(",", ".")))
+        return CountryScore(
+            country=util.str_normalise(" ".join(country), "_"), score=float(score.replace(",", "."))
+        )
 
 
 def get_ratings(tag: bs4.Tag):
@@ -167,7 +169,7 @@ def url_to_match(
     county_names = (url.path or "/").split("/")[-1].split("-vs-")
     if len(county_names) != 2:
         return None
-    cname1, cname2 = county_names
+    cname1, cname2 = map(lambda s: util.str_normalise(s, "_"), county_names)
     return model.Match(
         forecast_url=url, country1=country_name_map[cname1], country2=country_name_map[cname2]
     )
